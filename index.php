@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect('reminders');
         }
 
-        if (in_array($action, ['add_user', 'toggle_user'], true)) {
+        if (in_array($action, ['add_user', 'toggle_user', 'change_role'], true)) {
             require_permission('staff.manage');
             if ($action === 'add_user') {
                 $name = post_string('name', 120);
@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = (int) $db->lastInsertId();
                 audit('added team member', 'user', $id, $name . ' · ' . $role);
                 flash('success', 'Team member added.');
-            } else {
+            } elseif ($action === 'toggle_user') {
                 $id = (int) ($_POST['id'] ?? 0);
                 if ($id === (int) current_user()['id']) {
                     throw new InvalidArgumentException('You cannot deactivate your own account.');
@@ -199,6 +199,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db->prepare("UPDATE users SET status = IF(status='active','inactive','active') WHERE id=?")->execute([$id]);
                 audit('changed account status', 'user', $id);
                 flash('success', 'Team member status updated.');
+            } else {
+                $id = (int) ($_POST['id'] ?? 0);
+                $role = post_string('role', 20);
+                if ($id < 1 || $id === (int) current_user()['id']) {
+                    throw new InvalidArgumentException('You cannot change your own role.');
+                }
+                if (!in_array($role, ['admin', 'doctor', 'nurse', 'receptionist'], true)) {
+                    throw new InvalidArgumentException('Choose a valid team role.');
+                }
+                $memberQuery = $db->prepare('SELECT name FROM users WHERE id=?');
+                $memberQuery->execute([$id]);
+                $memberName = $memberQuery->fetchColumn();
+                if (!$memberName) {
+                    throw new InvalidArgumentException('Team member not found.');
+                }
+                $db->prepare('UPDATE users SET role=? WHERE id=?')->execute([$role, $id]);
+                audit('changed team role', 'user', $id, (string) $memberName . ' · ' . $role);
+                flash('success', 'Team member role updated.');
             }
             redirect('team');
         }
@@ -386,11 +404,6 @@ if ($page === 'messages') {
             $selectedTeammate = $teammate;
             break;
         }
-        if ($page === 'account') {
-            $accountQuery = $db->prepare('SELECT name, email, role, created_at FROM users WHERE id=?');
-            $accountQuery->execute([(int) $user['id']]);
-            $account = $accountQuery->fetch();
-        }
     }
     if (!$selectedTeammate && $teammates) {
         $selectedTeammate = $teammates[0];
@@ -407,6 +420,11 @@ if ($page === 'messages') {
         $threadQuery->execute([(int) $user['id'], (int) $selectedTeammate['id'], (int) $selectedTeammate['id'], (int) $user['id']]);
         $threadMessages = $threadQuery->fetchAll();
     }
+}
+if ($page === 'account') {
+    $accountQuery = $db->prepare('SELECT name, email, role, created_at FROM users WHERE id=?');
+    $accountQuery->execute([(int) $user['id']]);
+    $account = $accountQuery->fetch();
 }
 
 $flashMessage = take_flash();

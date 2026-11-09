@@ -175,6 +175,9 @@ h1, h2, p { margin-top: 0; }
 .required { color: #bd7467; }
 .you-tag { margin-left: 4px; color: #548473; font-size: 8px; font-weight: 700; letter-spacing: .5px; }
 .role-badge { display: inline-flex; padding: 5px 8px; border-radius: 5px; background: #f2f5f4; color: #66736f; font-size: 9px; font-weight: 600; }
+.role-edit-form { display: flex; align-items: center; gap: 5px; }
+.role-edit-form select { min-width: 100px; height: 29px; padding: 0 6px; border: 1px solid #e8edeb; border-radius: 5px; outline: 0; background: #fff; color: #67746f; cursor: pointer; font-size: 9px; transition: border-color .18s ease, box-shadow .18s ease; }
+.role-edit-form select:hover, .role-edit-form select:focus { border-color: #9bbcad; box-shadow: 0 0 0 2px rgba(68,139,114,.08); }
 .role-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 15px; }
 .role-cards article { display: flex; align-items: flex-start; gap: 10px; padding: 14px 12px; border: 1px solid #e9eeec; border-radius: 9px; background: #fff; }
 .role-symbol { display: grid; flex: 0 0 27px; width: 27px; height: 27px; place-items: center; border-radius: 8px; font-size: 12px; }

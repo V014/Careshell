@@ -35,10 +35,22 @@ function current_user(): ?array
 
 function require_login(): void
 {
-    if (!current_user()) {
+    $sessionUser = current_user();
+    if (!$sessionUser) {
         header('Location: login.php');
         exit;
     }
+    $statement = database()->prepare('SELECT id, name, email, role, status FROM users WHERE id=? LIMIT 1');
+    $statement->execute([(int) $sessionUser['id']]);
+    $account = $statement->fetch();
+    if (!$account || $account['status'] !== 'active') {
+        $_SESSION = [];
+        session_regenerate_id(true);
+        header('Location: login.php');
+        exit;
+    }
+    unset($account['status']);
+    $_SESSION['user'] = $account;
 }
 
 function can(string $permission): bool
