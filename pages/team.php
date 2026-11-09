@@ -1,0 +1,24 @@
+<section class="panel table-panel">
+    <div class="table-toolbar"><div><h2>Your care team <span class="count-badge"><?= number_format(count($team)) ?></span></h2><p>Each account has access based on its role</p></div><span class="role-note">Passwords are stored securely</span></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>TEAM MEMBER</th><th>ROLE</th><th>STATUS</th><th>JOINED</th><th></th></tr></thead><tbody>
+    <?php foreach ($team as $member): ?>
+        <tr><td><div class="table-person"><span class="table-avatar"><?= e(mb_strtoupper(mb_substr($member['name'], 0, 1))) ?></span><div><strong><?= e($member['name']) ?><?= (int) $member['id'] === (int) $user['id'] ? ' <span class="you-tag">YOU</span>' : '' ?></strong><span><?= e($member['email']) ?></span></div></div></td>
+        <td><span class="role-badge"><?= e(['admin' => 'Administrator', 'doctor' => 'Doctor', 'nurse' => 'Nurse', 'receptionist' => 'Receptionist'][$member['role']] ?? $member['role']) ?></span></td>
+        <td><span class="status-pill status-<?= e($member['status']) ?>"><?= e(ucfirst($member['status'])) ?></span></td><td><?= e(format_date($member['created_at'])) ?></td>
+        <td class="row-actions"><?php if ((int) $member['id'] !== (int) $user['id']): ?><form method="post" class="inline-form" data-confirm="<?= $member['status'] === 'active' ? 'Deactivate' : 'Reactivate' ?> this account?"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="toggle_user"><input type="hidden" name="id" value="<?= (int) $member['id'] ?>"><button class="button button-small <?= $member['status'] === 'active' ? 'button-quiet' : 'button-soft' ?>" type="submit"><?= $member['status'] === 'active' ? 'Deactivate' : 'Reactivate' ?></button></form><?php endif; ?></td></tr>
+    <?php endforeach; ?>
+    </tbody></table></div>
+    <div class="table-footer">Role access is enforced on every request, not just hidden in the interface.</div>
+</section>
+<section class="role-cards">
+    <article><span class="role-symbol role-admin">✦</span><div><strong>Administrator</strong><p>Full workspace access, including staff and activity.</p></div></article>
+    <article><span class="role-symbol role-doctor">＋</span><div><strong>Doctor</strong><p>Manage patient care, appointments, and reminders.</p></div></article>
+    <article><span class="role-symbol role-nurse">♡</span><div><strong>Nurse</strong><p>Update patient records and care team reminders.</p></div></article>
+    <article><span class="role-symbol role-reception">▦</span><div><strong>Receptionist</strong><p>Coordinate patient information and appointments.</p></div></article>
+</section>
+<dialog class="modal-dialog" id="userDialog"><form method="post" class="modal-card">
+    <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="add_user">
+    <div class="modal-heading"><div><p class="eyebrow">TEAM ACCESS</p><h2 class="dialog-title">Add team member</h2></div><button type="button" class="modal-close" data-close-dialog aria-label="Close">×</button></div>
+    <div class="form-grid"><label class="field-span">Full name<input name="name" required minlength="2" maxlength="120" placeholder="Team member name"></label><label class="field-span">Work email<input type="email" name="email" required maxlength="190" placeholder="name@clinic.com"></label><label class="field-span">Temporary password<input type="password" name="password" required minlength="12" autocomplete="new-password"><small>At least 12 characters. Share it securely.</small></label><label class="field-span">Role<select name="role"><option value="doctor">Doctor</option><option value="nurse">Nurse</option><option value="receptionist">Receptionist</option><option value="admin">Administrator</option></select></label></div>
+    <div class="modal-actions"><button type="button" class="button button-quiet" data-close-dialog>Cancel</button><button type="submit" class="button button-primary">Create account <span>→</span></button></div>
+</form></dialog>
