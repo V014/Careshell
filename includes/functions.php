@@ -45,10 +45,10 @@ function can(string $permission): bool
 {
     $role = current_user()['role'] ?? '';
     $permissions = [
-        'admin' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit', 'staff.manage', 'activity.view'],
-        'doctor' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit'],
-        'nurse' => ['patients.view', 'patients.edit', 'appointments.view', 'reminders.view', 'reminders.edit'],
-        'receptionist' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit'],
+        'admin' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit', 'staff.manage', 'activity.view', 'forum.view', 'messages.view'],
+        'doctor' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit', 'forum.view', 'messages.view'],
+        'nurse' => ['patients.view', 'patients.edit', 'appointments.view', 'reminders.view', 'reminders.edit', 'forum.view', 'messages.view'],
+        'receptionist' => ['patients.view', 'patients.edit', 'appointments.view', 'appointments.edit', 'reminders.view', 'reminders.edit', 'forum.view', 'messages.view'],
     ];
     return in_array($permission, $permissions[$role] ?? [], true);
 }

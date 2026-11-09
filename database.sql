@@ -63,6 +63,45 @@ CREATE TABLE IF NOT EXISTS reminders (
     INDEX idx_reminders_date (reminder_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS team_posts (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(180) NOT NULL,
+    body TEXT NOT NULL,
+    author_id INT UNSIGNED DEFAULT NULL,
+    author_name VARCHAR(120) NOT NULL,
+    legacy_source_id INT DEFAULT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_team_posts_user FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_team_posts_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS team_comments (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    post_id INT UNSIGNED NOT NULL,
+    author_id INT UNSIGNED DEFAULT NULL,
+    author_name VARCHAR(120) NOT NULL,
+    body TEXT NOT NULL,
+    legacy_source_id INT DEFAULT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_team_comments_post FOREIGN KEY (post_id) REFERENCES team_posts(id) ON DELETE CASCADE,
+    CONSTRAINT fk_team_comments_user FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_team_comments_post (post_id, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT UNSIGNED NOT NULL,
+    recipient_id INT UNSIGNED NOT NULL,
+    body TEXT NOT NULL,
+    read_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_messages_sender FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_messages_recipient FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_messages_thread (sender_id, recipient_id, created_at),
+    INDEX idx_messages_unread (recipient_id, read_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS activity_logs (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED DEFAULT NULL,
