@@ -20,15 +20,17 @@ try {
     $pdo = database();
     $installed = (bool) $pdo->query("SHOW TABLES LIKE 'users'")->fetchColumn();
 } catch (Throwable $exception) {
+    error_log('Careflow database connection failed: ' . $exception->getMessage());
     http_response_code(500);
     exit('Database connection failed. Check config.php and ensure MySQL is running.');
 }
 
-if (!$installed && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'install.php') {
+if (!$installed && !in_array(basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')), ['install.php', 'login.php'], true)) {
     header('Location: install.php');
     exit;
 }
 
-if ($installed && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'install.php') {
+if ($installed && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'install.php'
+    && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'login.php') {
     require_login();
 }

@@ -5,8 +5,17 @@ session_start();
 $config = require __DIR__ . '/config.php';
 $error = '';
 $complete = false;
+if (empty($_SESSION['setup_csrf'])) {
+    $_SESSION['setup_csrf'] = bin2hex(random_bytes(32));
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $submittedToken = (string) ($_POST['csrf_token'] ?? '');
+    if ($submittedToken === '' || !hash_equals($_SESSION['setup_csrf'], $submittedToken)) {
+        http_response_code(419);
+        exit('Your setup session expired. Reload the page and try again.');
+    }
+
     $name = trim((string) ($_POST['name'] ?? ''));
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
     $password = (string) ($_POST['password'] ?? '');
@@ -77,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="auth-heading"><p class="eyebrow">FIRST-TIME SETUP</p><h1>Create your workspace</h1><p>Connect to MySQL and create the first administrator account.</p></div>
         <?php if ($error !== ''): ?><div class="notice notice-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
         <form method="post" class="stack-form">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['setup_csrf'], ENT_QUOTES, 'UTF-8') ?>">
             <label>Full name<input name="name" autocomplete="name" required minlength="2" value="<?= htmlspecialchars((string) ($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></label>
             <label>Work email<input type="email" name="email" autocomplete="email" required value="<?= htmlspecialchars((string) ($_POST['email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"></label>
             <label>Password<input type="password" name="password" autocomplete="new-password" required minlength="12"><small>Use at least 12 characters.</small></label>

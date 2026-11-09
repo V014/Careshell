@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS patients (
     address VARCHAR(255) DEFAULT NULL,
     notes TEXT DEFAULT NULL,
     created_by INT UNSIGNED DEFAULT NULL,
+    legacy_source_id INT DEFAULT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_patients_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
@@ -39,6 +40,7 @@ CREATE TABLE IF NOT EXISTS appointments (
     appointment_time TIME DEFAULT NULL,
     status ENUM('scheduled','confirmed','completed','cancelled','no_show') NOT NULL DEFAULT 'scheduled',
     created_by INT UNSIGNED DEFAULT NULL,
+    legacy_source_id INT DEFAULT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_appointments_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE SET NULL,
@@ -55,6 +57,7 @@ CREATE TABLE IF NOT EXISTS reminders (
     reminder_time TIME DEFAULT NULL,
     repeat_rule ENUM('none','daily','weekly','monthly') NOT NULL DEFAULT 'none',
     created_by INT UNSIGNED DEFAULT NULL,
+    legacy_source_id INT DEFAULT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_reminders_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_reminders_date (reminder_date)
