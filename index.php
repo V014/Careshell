@@ -215,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $user = current_user();
 $counts = [
     'patients' => (int) $db->query('SELECT COUNT(*) FROM patients')->fetchColumn(),
-    'appointments' => (int) $db->query('SELECT COUNT(*) FROM appointments WHERE appointment_date = CURDATE() AND status NOT IN ("cancelled","no_show")')->fetchColumn(),
+    'appointments' => (int) $db->query("SELECT COUNT(*) FROM appointments WHERE appointment_date = CURDATE() AND status NOT IN ('cancelled','no_show')")->fetchColumn(),
     'upcoming' => (int) $db->query('SELECT COUNT(*) FROM appointments WHERE appointment_date >= CURDATE() AND status IN ("scheduled","confirmed")')->fetchColumn(),
     'reminders' => (int) $db->query('SELECT COUNT(*) FROM reminders WHERE reminder_date >= CURDATE()')->fetchColumn(),
 ];
@@ -224,7 +224,9 @@ $todayAppointments = $db->query(
      WHERE a.appointment_date = CURDATE() AND a.status NOT IN ('cancelled','no_show')
      ORDER BY a.appointment_time LIMIT 6"
 )->fetchAll();
-$recentActivity = $db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 6')->fetchAll();
+$recentActivity = can('activity.view')
+    ? $db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 6')->fetchAll()
+    : [];
 $search = trim((string) ($_GET['q'] ?? ''));
 $patients = [];
 $appointments = [];

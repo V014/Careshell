@@ -118,6 +118,10 @@ h1, h2, p { margin-top: 0; }
 .activity-list { display: grid; }
 .activity-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-top: 1px solid #f0f2f1; }
 .activity-mark { flex-basis: 27px; width: 27px; height: 27px; background: #f0eff9; color: #7775a6; font-size: 9px; }
+.workspace-link { align-items: center; transition: background .16s ease; }
+.workspace-link:hover { background: #f9fbfa; }
+.workspace-arrow { margin-left: auto; color: #86a79a; font-size: 14px; transition: transform .18s ease; }
+.workspace-link:hover .workspace-arrow { transform: translateX(3px); }
 .activity-copy { min-width: 0; }
 .activity-copy p { margin: 1px 0 5px; color: #788481; font-size: 10px; line-height: 1.55; }
 .activity-copy p strong { color: #4b5855; font-weight: 600; }

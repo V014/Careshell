@@ -22,6 +22,7 @@
             <div class="empty-state"><span class="empty-icon">☀</span><strong>A little breathing room.</strong><p>No appointments scheduled for today.</p><?php if (can('appointments.edit')): ?><button class="button button-soft" type="button" data-open-dialog="appointmentDialog">Schedule a visit</button><?php endif; ?></div>
         <?php endif; ?>
     </article>
+    <?php if (can('activity.view')): ?>
     <article class="panel activity-panel">
         <div class="panel-heading"><div><h2>Recent activity</h2><p>Updates from your workspace</p></div><?php if (can('activity.view')): ?><a class="text-link" href="index.php?page=activity">View all <span>→</span></a><?php endif; ?></div>
         <?php if ($recentActivity): ?>
@@ -34,5 +35,15 @@
             <div class="empty-state compact-empty"><span class="empty-icon">✳</span><strong>Your activity will show up here.</strong><p>Changes made by your team are kept in one place.</p></div>
         <?php endif; ?>
     </article>
+    <?php else: ?>
+    <article class="panel activity-panel">
+        <div class="panel-heading"><div><h2>Your workspace</h2><p>The tools your team uses every day</p></div></div>
+        <div class="activity-list">
+            <?php if (can('patients.view')): ?><a class="activity-row workspace-link" href="index.php?page=patients"><span class="activity-mark">◉</span><div class="activity-copy"><p><strong>Patient records</strong></p><span>Find a patient or update care details</span></div><span class="workspace-arrow">→</span></a><?php endif; ?>
+            <?php if (can('appointments.view')): ?><a class="activity-row workspace-link" href="index.php?page=appointments"><span class="activity-mark">▦</span><div class="activity-copy"><p><strong>Appointment schedule</strong></p><span>Coordinate upcoming visits</span></div><span class="workspace-arrow">→</span></a><?php endif; ?>
+            <?php if (can('reminders.view')): ?><a class="activity-row workspace-link" href="index.php?page=reminders"><span class="activity-mark">◷</span><div class="activity-copy"><p><strong>Team reminders</strong></p><span>Keep important details close at hand</span></div><span class="workspace-arrow">→</span></a><?php endif; ?>
+        </div>
+    </article>
+    <?php endif; ?>
 </section>
 <section class="bottom-callout"><div class="callout-symbol">✦</div><div><strong>Make space for what matters.</strong><p>Keep patient details, visits, and team reminders working together.</p></div><a href="index.php?page=patients" class="text-link">Browse patients <span>→</span></a></section>
