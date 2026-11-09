@@ -35,8 +35,10 @@ $navItems = [
         <div class="sidebar-spacer"></div>
         <div class="privacy-card"><span class="privacy-icon">✓</span><div><strong>Care, kept private.</strong><p>Only your team can access this workspace.</p></div></div>
         <div class="sidebar-user">
-            <div class="avatar"><?= e(mb_strtoupper(mb_substr($user['name'], 0, 1))) ?></div>
-            <div class="user-meta"><strong><?= e($user['name']) ?></strong><span><?= e($roleLabels[$user['role']] ?? $user['role']) ?></span></div>
+            <a class="user-account-link" href="index.php?page=account" aria-label="Open account settings">
+                <div class="avatar"><?= e(mb_strtoupper(mb_substr($user['name'], 0, 1))) ?></div>
+                <div class="user-meta"><strong><?= e($user['name']) ?></strong><span><?= e($roleLabels[$user['role']] ?? $user['role']) ?></span></div>
+            </a>
             <a class="signout" href="logout.php" aria-label="Sign out" title="Sign out">↗</a>
         </div>
     </aside>

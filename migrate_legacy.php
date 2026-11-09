@@ -66,8 +66,9 @@ $existing = static function (PDO $pdo, string $table, int $legacyId): ?int {
     $id = $statement->fetchColumn();
     return $id === false ? null : (int) $id;
 };
-$counts = ['patients' => 0, 'appointments' => 0, 'reminders' => 0];
+$counts = ['patients' => 0, 'appointments' => 0, 'reminders' => 0, 'discussions' => 0, 'replies' => 0];
 $patientMap = [];
+$forumMap = [];
 
 $target->beginTransaction();
 try {
@@ -169,6 +170,53 @@ try {
         }
     }
 
+    if (isset($available['forum'])) {
+        foreach ($legacy->query('SELECT * FROM forum ORDER BY ID') as $row) {
+            $legacyId = (int) $get($row, 'ID', 0);
+            if ($legacyId < 1) {
+                continue;
+            }
+            $values = [
+                (string) $get($row, 'Title', 'Team update'),
+                (string) $get($row, 'Description', ''),
+                (string) $get($row, 'Lead', 'Legacy team member'),
+                $legacyId,
+            ];
+            $id = $existing($target, 'team_posts', $legacyId);
+            if ($id) {
+                $target->prepare('UPDATE team_posts SET title=?, body=?, author_name=? WHERE legacy_source_id=?')->execute($values);
+            } else {
+                $target->prepare('INSERT INTO team_posts (title, body, author_name, legacy_source_id) VALUES (?,?,?,?)')->execute($values);
+                $id = (int) $target->lastInsertId();
+                $counts['discussions']++;
+            }
+            $forumMap[$legacyId] = $id;
+        }
+    }
+
+    if (isset($available['comments'])) {
+        foreach ($legacy->query('SELECT * FROM comments ORDER BY ID') as $row) {
+            $legacyId = (int) $get($row, 'ID', 0);
+            $postId = $forumMap[(int) $get($row, 'ForumID', 0)] ?? null;
+            $body = trim((string) $get($row, 'Comment', ''));
+            if ($legacyId < 1 || !$postId || $body === '') {
+                continue;
+            }
+            $values = [
+                $postId,
+                (string) $get($row, 'Name', 'Legacy team member'),
+                $body,
+                $legacyId,
+            ];
+            if ($existing($target, 'team_comments', $legacyId)) {
+                $target->prepare('UPDATE team_comments SET post_id=?, author_name=?, body=? WHERE legacy_source_id=?')->execute($values);
+            } else {
+                $target->prepare('INSERT INTO team_comments (post_id, author_name, body, legacy_source_id) VALUES (?,?,?,?)')->execute($values);
+                $counts['replies']++;
+            }
+        }
+    }
+
     $target->commit();
 } catch (Throwable $exception) {
     if ($target->inTransaction()) {
@@ -179,9 +227,11 @@ try {
 }
 
 printf(
-    "Legacy import complete. Added %d patients, %d appointments, and %d reminders. Existing imported records were refreshed; run again safely to resume.\n",
+    "Legacy import complete. Added %d patients, %d appointments, %d reminders, %d discussions, and %d replies. Existing imported records were refreshed; run again safely to resume.\n",
     $counts['patients'],
     $counts['appointments'],
-    $counts['reminders']
+    $counts['reminders'],
+    $counts['discussions'],
+    $counts['replies']
 );
-fwrite(STDOUT, "Profile PINs, staff sessions, images, forum posts, and private messages were not imported.\n");
+fwrite(STDOUT, "Profile PINs, staff sessions, images, and private messages were not imported.\n");

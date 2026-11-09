@@ -5,7 +5,7 @@ require __DIR__ . '/includes/bootstrap.php';
 
 $db = database();
 $page = (string) ($_GET['page'] ?? 'dashboard');
-$allowedPages = ['dashboard', 'patients', 'appointments', 'reminders', 'team', 'activity', 'forum', 'messages'];
+$allowedPages = ['dashboard', 'patients', 'appointments', 'reminders', 'team', 'activity', 'forum', 'messages', 'account'];
 if (!in_array($page, $allowedPages, true)) {
     $page = 'dashboard';
 }
@@ -254,6 +254,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        if ($action === 'update_profile') {
+            $name = post_string('name', 120);
+            $email = strtolower(post_string('email', 190));
+            if (mb_strlen($name) < 2 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException('Enter a valid name and email address.');
+            }
+            $db->prepare('UPDATE users SET name=?, email=? WHERE id=?')->execute([
+                $name, $email, (int) current_user()['id'],
+            ]);
+            $_SESSION['user']['name'] = $name;
+            $_SESSION['user']['email'] = $email;
+            audit('updated profile', 'account', (int) current_user()['id']);
+            flash('success', 'Your profile has been updated.');
+            redirect('account');
+        }
+
+        if ($action === 'change_password') {
+            $currentPassword = (string) ($_POST['current_password'] ?? '');
+            $newPassword = (string) ($_POST['new_password'] ?? '');
+            $confirmation = (string) ($_POST['password_confirmation'] ?? '');
+            $statement = $db->prepare('SELECT password_hash FROM users WHERE id=?');
+            $statement->execute([(int) current_user()['id']]);
+            $passwordHash = (string) $statement->fetchColumn();
+            if (!password_verify($currentPassword, $passwordHash)) {
+                throw new InvalidArgumentException('Your current password is incorrect.');
+            }
+            if (strlen($newPassword) < 12 || $newPassword !== $confirmation) {
+                throw new InvalidArgumentException('Choose a matching new password with at least 12 characters.');
+            }
+            $db->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([
+                password_hash($newPassword, PASSWORD_DEFAULT), (int) current_user()['id'],
+            ]);
+            audit('changed password', 'account', (int) current_user()['id']);
+            flash('success', 'Your password has been changed.');
+            redirect('account');
+        }
+
         throw new InvalidArgumentException('This action is not available.');
     } catch (InvalidArgumentException $exception) {
         flash('error', $exception->getMessage());
@@ -349,6 +386,11 @@ if ($page === 'messages') {
             $selectedTeammate = $teammate;
             break;
         }
+        if ($page === 'account') {
+            $accountQuery = $db->prepare('SELECT name, email, role, created_at FROM users WHERE id=?');
+            $accountQuery->execute([(int) $user['id']]);
+            $account = $accountQuery->fetch();
+        }
     }
     if (!$selectedTeammate && $teammates) {
         $selectedTeammate = $teammates[0];
@@ -377,6 +419,7 @@ $pageTitles = [
     'activity' => 'Activity log',
     'forum' => 'Team board',
     'messages' => 'Messages',
+    'account' => 'My account',
 ];
 $pageDescriptions = [
     'dashboard' => 'A clear view of today’s care and what needs attention.',
@@ -387,6 +430,7 @@ $pageDescriptions = [
     'activity' => 'A record of recent changes across your workspace.',
     'forum' => 'Share updates and keep team discussions in one place.',
     'messages' => 'Have a private conversation with a teammate.',
+    'account' => 'Manage your personal information and sign-in security.',
 ];
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/pages/' . $page . '.php';
