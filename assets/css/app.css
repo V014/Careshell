@@ -199,6 +199,68 @@ h1, h2, p { margin-top: 0; }
 .reminder-empty { grid-column: 1 / -1; }
 .activity-action { display: inline-flex; padding: 4px 7px; border-radius: 5px; background: #edf5f1; color: #50806d; font-size: 9px; font-weight: 600; }
 .activity-details { max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+.forum-layout { display: grid; max-width: 880px; gap: 13px; margin: 0 auto; }
+.start-discussion { display: flex; gap: 12px; padding: 17px; }
+.compose-avatar { display: grid; flex: 0 0 33px; width: 33px; height: 33px; place-items: center; border-radius: 50%; background: #e6f0eb; color: #43806d; font-size: 11px; font-weight: 700; }
+.discussion-form { display: grid; min-width: 0; flex: 1; gap: 8px; }
+.discussion-form input, .discussion-form textarea, .comment-form input, .message-compose textarea { width: 100%; padding: 9px 10px; border: 1px solid #e8edeb; border-radius: 7px; outline: 0; background: #fbfcfb; color: #52605c; font-size: 11px; transition: border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+.discussion-form input:focus, .discussion-form textarea:focus, .comment-form input:focus, .message-compose textarea:focus { border-color: #86b5a4; background: #fff; box-shadow: 0 0 0 3px rgba(68,139,114,.09); }
+.discussion-form input::placeholder, .discussion-form textarea::placeholder, .comment-form input::placeholder, .message-compose textarea::placeholder { color: #a4afaa; }
+.discussion-form textarea { resize: vertical; }
+.discussion-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.discussion-form-footer > span { color: #9aa49f; font-size: 9px; }
+.discussion-card { padding: 19px 20px 14px; }
+.discussion-author { display: flex; align-items: center; gap: 9px; }
+.discussion-author > div { display: grid; gap: 4px; }
+.discussion-author strong { color: #51605b; font-size: 10px; font-weight: 600; }
+.discussion-author > div > span { color: #9aa49f; font-size: 9px; }
+.discussion-card > h2 { margin: 15px 0 6px; color: #364540; font-family: var(--font-heading); font-size: 14px; font-weight: 700; letter-spacing: -.3px; }
+.discussion-body { margin: 0; color: #687671; font-size: 11px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.discussion-replies { margin-top: 15px; padding: 10px 0 8px; border-top: 1px solid #eff2f1; color: #899590; font-size: 9px; }
+.discussion-comment { display: flex; gap: 9px; padding: 8px 0; }
+.comment-avatar { display: grid; flex: 0 0 25px; width: 25px; height: 25px; place-items: center; border-radius: 50%; background: #f0eff9; color: #7774a5; font-size: 9px; font-weight: 700; }
+.comment-content { min-width: 0; flex: 1; padding: 8px 10px; border-radius: 7px; background: #f8faf9; }
+.comment-content > div { display: flex; align-items: center; gap: 8px; }
+.comment-content strong { color: #5b6864; font-size: 9px; font-weight: 600; }
+.comment-content > div > span { color: #a1aaa7; font-size: 8px; }
+.comment-content p { margin: 5px 0 0; color: #71807a; font-size: 10px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-form { display: flex; align-items: center; gap: 8px; margin-top: 9px; padding-top: 11px; border-top: 1px solid #eff2f1; }
+.own-avatar { background: #e7f1ec; color: #4c806e; }
+.comment-form input { min-width: 0; min-height: 33px; padding-top: 6px; padding-bottom: 6px; background: #fff; }
+.reply-submit { display: grid; flex: 0 0 30px; width: 30px; height: 30px; place-items: center; border: 0; border-radius: 7px; background: #edf5f1; color: #46806d; cursor: pointer; transition: background .18s ease, transform .18s ease; }
+.reply-submit:hover { transform: translateX(2px); background: #e0eee7; }
+.messages-panel { display: grid; min-height: 570px; grid-template-columns: 255px minmax(0, 1fr); overflow: hidden; }
+.conversation-list { padding: 17px 11px; border-right: 1px solid #edf0ef; background: #fcfdfc; }
+.conversation-heading { padding: 0 8px 14px; }
+.conversation-heading h2 { margin: 0; color: #4b5854; font-family: var(--font-heading); font-size: 12px; }
+.conversation-heading p { margin: 5px 0 0; color: #9aa4a0; font-size: 9px; }
+.conversation-link { display: flex; align-items: center; gap: 9px; padding: 9px 8px; border-radius: 7px; transition: background .18s ease; }
+.conversation-link:hover { background: #f3f7f5; }
+.conversation-link.selected { background: #eaf3ef; }
+.conversation-person { display: grid; min-width: 0; flex: 1; gap: 4px; }
+.conversation-person strong { overflow: hidden; color: #52615b; font-size: 10px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.conversation-person > span { color: #98a29e; font-size: 9px; }
+.unread-dot { width: 7px; height: 7px; border-radius: 50%; background: #5a9c81; }
+.message-thread { display: flex; min-width: 0; flex-direction: column; }
+.thread-heading { display: flex; min-height: 65px; align-items: center; gap: 10px; padding: 12px 17px; border-bottom: 1px solid #edf0ef; }
+.thread-heading > div { display: grid; gap: 4px; }
+.thread-heading strong { color: #4d5a56; font-size: 10px; font-weight: 600; }
+.thread-heading > div > span { color: #98a29e; font-size: 9px; }
+.thread-lock { margin-left: auto; padding: 5px 8px; border-radius: 12px; background: #f0f5f2; color: #6b8a7b; font-size: 8px; }
+.message-history { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 9px; padding: 17px; overflow-y: auto; background: linear-gradient(180deg,#fff,#fbfcfb); }
+.message-day { display: flex; align-items: center; justify-content: center; margin: 5px 0; }
+.message-day span { padding: 5px 8px; border-radius: 10px; background: #f3f6f4; color: #929d98; font-size: 8px; }
+.message-line { display: flex; }
+.message-own { justify-content: flex-end; }
+.message-bubble { max-width: min(78%, 440px); padding: 9px 11px 6px; border-radius: 10px 10px 10px 3px; background: #f0f3f2; color: #52615b; font-size: 10px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message-own .message-bubble { border-radius: 10px 10px 3px 10px; background: #e7f2ed; color: #426c5c; }
+.message-bubble > span { display: block; margin-top: 4px; color: #9aa59f; font-size: 8px; text-align: right; }
+.thread-empty { min-height: 320px; flex: 1; }
+.message-compose { display: flex; align-items: flex-end; gap: 9px; padding: 12px 14px; border-top: 1px solid #edf0ef; background: #fff; }
+.message-compose textarea { min-height: 37px; max-height: 110px; resize: vertical; background: #fbfcfb; }
+.message-compose > button { display: grid; flex: 0 0 35px; width: 35px; height: 35px; place-items: center; border: 0; border-radius: 8px; background: var(--green); color: #fff; cursor: pointer; font-size: 16px; transition: background .18s ease, transform .18s ease; }
+.message-compose > button:hover { transform: translateY(-1px); background: var(--green-dark); }
 
 .modal-dialog { width: min(540px, calc(100vw - 28px)); max-height: min(90vh, 760px); padding: 0; overflow: auto; border: 0; border-radius: 13px; background: transparent; color: var(--ink); box-shadow: 0 24px 80px rgba(25,46,40,.22); opacity: 0; transform: translateY(9px) scale(.99); transition: opacity .2s ease, transform .22s ease, overlay .2s allow-discrete, display .2s allow-discrete; }
 .modal-dialog[open] { opacity: 1; transform: translateY(0) scale(1); }
@@ -302,6 +364,13 @@ h1, h2, p { margin-top: 0; }
     .role-cards article { gap: 7px; padding: 11px 9px; }
     .role-cards p { font-size: 8px; }
     .reminder-grid { grid-template-columns: 1fr; gap: 10px; }
+    .messages-panel { grid-template-columns: 1fr; }
+    .conversation-list { display: flex; gap: 3px; padding: 10px; overflow-x: auto; border-right: 0; border-bottom: 1px solid #edf0ef; }
+    .conversation-heading { display: none; }
+    .conversation-link { flex: 0 0 auto; min-width: 140px; }
+    .message-thread { min-height: 440px; }
+    .thread-heading { padding: 10px 13px; }
+    .message-history { padding: 13px; }
     .reminder-empty { padding: 0; }
     .modal-card { padding: 20px 16px; }
     .form-grid { gap: 11px 9px; }

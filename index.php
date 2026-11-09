@@ -5,7 +5,7 @@ require __DIR__ . '/includes/bootstrap.php';
 
 $db = database();
 $page = (string) ($_GET['page'] ?? 'dashboard');
-$allowedPages = ['dashboard', 'patients', 'appointments', 'reminders', 'team', 'activity'];
+$allowedPages = ['dashboard', 'patients', 'appointments', 'reminders', 'team', 'activity', 'forum', 'messages'];
 if (!in_array($page, $allowedPages, true)) {
     $page = 'dashboard';
 }
@@ -16,6 +16,8 @@ $pagePermissions = [
     'reminders' => 'reminders.view',
     'team' => 'staff.manage',
     'activity' => 'activity.view',
+    'forum' => 'forum.view',
+    'messages' => 'messages.view',
 ];
 if (isset($pagePermissions[$page])) {
     require_permission($pagePermissions[$page]);
@@ -201,6 +203,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect('team');
         }
 
+        if ($action === 'create_post') {
+            $title = post_string('title', 180);
+            $body = post_string('body', 4000);
+            if ($title === '' || $body === '') {
+                throw new InvalidArgumentException('Add a title and a message to start a discussion.');
+            }
+            $db->prepare('INSERT INTO team_posts (title, body, author_id, author_name) VALUES (?,?,?,?)')->execute([
+                $title, $body, (int) current_user()['id'], current_user()['name'],
+            ]);
+            $id = (int) $db->lastInsertId();
+            audit('started a discussion', 'team post', $id, $title);
+            flash('success', 'Your discussion has been posted.');
+            redirect('forum');
+        }
+
+        if ($action === 'add_comment') {
+            $postId = (int) ($_POST['post_id'] ?? 0);
+            $body = post_string('body', 2000);
+            $check = $db->prepare('SELECT id FROM team_posts WHERE id=?');
+            $check->execute([$postId]);
+            if (!$check->fetchColumn() || $body === '') {
+                throw new InvalidArgumentException('Choose a discussion and enter a reply.');
+            }
+            $db->prepare('INSERT INTO team_comments (post_id, author_id, author_name, body) VALUES (?,?,?,?)')->execute([
+                $postId, (int) current_user()['id'], current_user()['name'], $body,
+            ]);
+            audit('replied to a discussion', 'team post', $postId);
+            flash('success', 'Your reply has been added.');
+            redirect('forum');
+        }
+
+        if ($action === 'send_message') {
+            $recipientId = (int) ($_POST['recipient_id'] ?? 0);
+            $body = post_string('body', 2000);
+            if ($recipientId < 1 || $recipientId === (int) current_user()['id'] || $body === '') {
+                throw new InvalidArgumentException('Choose a teammate and enter a message.');
+            }
+            $recipient = $db->prepare("SELECT id, name FROM users WHERE id=? AND status='active'");
+            $recipient->execute([$recipientId]);
+            $teammate = $recipient->fetch();
+            if (!$teammate) {
+                throw new InvalidArgumentException('That teammate is not available.');
+            }
+            $db->prepare('INSERT INTO direct_messages (sender_id, recipient_id, body) VALUES (?,?,?)')->execute([
+                (int) current_user()['id'], $recipientId, $body,
+            ]);
+            audit('sent a message', 'team member', $recipientId, $teammate['name']);
+            header('Location: index.php?page=messages&with=' . $recipientId);
+            exit;
+        }
+
         throw new InvalidArgumentException('This action is not available.');
     } catch (InvalidArgumentException $exception) {
         flash('error', $exception->getMessage());
@@ -227,6 +280,9 @@ $todayAppointments = $db->query(
 $recentActivity = can('activity.view')
     ? $db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 6')->fetchAll()
     : [];
+$unreadQuery = $db->prepare('SELECT COUNT(*) FROM direct_messages WHERE recipient_id=? AND read_at IS NULL');
+$unreadQuery->execute([(int) $user['id']]);
+$unreadMessages = (int) $unreadQuery->fetchColumn();
 $search = trim((string) ($_GET['q'] ?? ''));
 $patients = [];
 $appointments = [];
@@ -263,6 +319,53 @@ if ($page === 'team') {
 if ($page === 'activity') {
     $activities = $db->query('SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 300')->fetchAll();
 }
+if ($page === 'forum') {
+    $discussionPosts = $db->query(
+        'SELECT p.*, (SELECT COUNT(*) FROM team_comments c WHERE c.post_id=p.id) AS comment_count
+         FROM team_posts p ORDER BY p.created_at DESC LIMIT 100'
+    )->fetchAll();
+    $commentRows = $db->query('SELECT * FROM team_comments ORDER BY created_at')->fetchAll();
+    $commentsByPost = [];
+    foreach ($commentRows as $comment) {
+        $commentsByPost[$comment['post_id']][] = $comment;
+    }
+}
+if ($page === 'messages') {
+    $memberQuery = $db->prepare(
+        "SELECT u.id, u.name, u.role,
+            (SELECT MAX(m.created_at) FROM direct_messages m
+             WHERE (m.sender_id=u.id AND m.recipient_id=?) OR (m.sender_id=? AND m.recipient_id=u.id)) AS latest_message,
+            (SELECT COUNT(*) FROM direct_messages m
+             WHERE m.sender_id=u.id AND m.recipient_id=? AND m.read_at IS NULL) AS unread_count
+         FROM users u WHERE u.status='active' AND u.id<>?
+         ORDER BY latest_message IS NULL, latest_message DESC, u.name"
+    );
+    $memberQuery->execute([(int) $user['id'], (int) $user['id'], (int) $user['id'], (int) $user['id']]);
+    $teammates = $memberQuery->fetchAll();
+    $selectedId = (int) ($_GET['with'] ?? 0);
+    $selectedTeammate = null;
+    foreach ($teammates as $teammate) {
+        if ((int) $teammate['id'] === $selectedId) {
+            $selectedTeammate = $teammate;
+            break;
+        }
+    }
+    if (!$selectedTeammate && $teammates) {
+        $selectedTeammate = $teammates[0];
+    }
+    $threadMessages = [];
+    if ($selectedTeammate) {
+        $db->prepare('UPDATE direct_messages SET read_at=CURRENT_TIMESTAMP WHERE sender_id=? AND recipient_id=? AND read_at IS NULL')
+            ->execute([(int) $selectedTeammate['id'], (int) $user['id']]);
+        $threadQuery = $db->prepare(
+            'SELECT * FROM direct_messages
+             WHERE (sender_id=? AND recipient_id=?) OR (sender_id=? AND recipient_id=?)
+             ORDER BY created_at ASC LIMIT 500'
+        );
+        $threadQuery->execute([(int) $user['id'], (int) $selectedTeammate['id'], (int) $selectedTeammate['id'], (int) $user['id']]);
+        $threadMessages = $threadQuery->fetchAll();
+    }
+}
 
 $flashMessage = take_flash();
 $pageTitles = [
@@ -272,6 +375,8 @@ $pageTitles = [
     'reminders' => 'Reminders',
     'team' => 'Team access',
     'activity' => 'Activity log',
+    'forum' => 'Team board',
+    'messages' => 'Messages',
 ];
 $pageDescriptions = [
     'dashboard' => 'A clear view of today’s care and what needs attention.',
@@ -280,6 +385,8 @@ $pageDescriptions = [
     'reminders' => 'A shared place for the details your team should not miss.',
     'team' => 'Manage staff accounts and their workspace access.',
     'activity' => 'A record of recent changes across your workspace.',
+    'forum' => 'Share updates and keep team discussions in one place.',
+    'messages' => 'Have a private conversation with a teammate.',
 ];
 require __DIR__ . '/includes/header.php';
 require __DIR__ . '/pages/' . $page . '.php';

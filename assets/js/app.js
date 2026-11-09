@@ -133,4 +133,7 @@
         const selected = patientSelect.options[patientSelect.selectedIndex];
         if (patientName) patientName.value = selected.textContent.trim();
     });
+
+    const historyPanel = document.querySelector('[data-message-history]');
+    if (historyPanel) historyPanel.scrollTop = historyPanel.scrollHeight;
 })();

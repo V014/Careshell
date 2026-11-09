@@ -5,6 +5,8 @@ $navItems = [
     'patients' => ['Patients', '◉', 'patients.view'],
     'appointments' => ['Appointments', '▦', 'appointments.view'],
     'reminders' => ['Reminders', '◷', 'reminders.view'],
+    'forum' => ['Team board', '✳', 'forum.view'],
+    'messages' => ['Messages', '✉', 'messages.view'],
     'team' => ['Team access', '♙', 'staff.manage'],
     'activity' => ['Activity log', '↗', 'activity.view'],
 ];
@@ -26,7 +28,7 @@ $navItems = [
         <nav class="main-nav" aria-label="Main navigation">
             <?php foreach ($navItems as $key => [$label, $icon, $permission]): ?>
                 <?php if ($permission === null || can($permission)): ?>
-                    <a class="nav-link <?= $page === $key ? 'active' : '' ?>" href="index.php?page=<?= e($key) ?>"><span class="nav-icon"><?= e($icon) ?></span><span><?= e($label) ?></span><?php if ($key === 'appointments' && $counts['appointments'] > 0): ?><span class="nav-count"><?= $counts['appointments'] ?></span><?php endif; ?></a>
+                    <a class="nav-link <?= $page === $key ? 'active' : '' ?>" href="index.php?page=<?= e($key) ?>"><span class="nav-icon"><?= e($icon) ?></span><span><?= e($label) ?></span><?php if ($key === 'appointments' && $counts['appointments'] > 0): ?><span class="nav-count"><?= $counts['appointments'] ?></span><?php endif; ?><?php if ($key === 'messages' && $unreadMessages > 0): ?><span class="nav-count"><?= $unreadMessages ?></span><?php endif; ?></a>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>
