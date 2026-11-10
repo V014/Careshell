@@ -29,6 +29,8 @@ D:\xampp\php\php.exe migrate_legacy.php "D:\backups\medCRM.db"
 
 The importer moves patient demographics and notes, appointments, reminders, forum discussions, and their replies. It can be run again without duplicating imported records. It intentionally does not migrate PIN credentials, local sessions, images, or private messages; staff should receive new web accounts and passwords. The XAMPP PHP installation must have `pdo_sqlite` enabled for the importer.
 
+The preserved legacy database is blocked from direct web access by `legacy\.htaccess`; the command-line importer can still read it.
+
 ## Roles
 
 | Role | Access |
