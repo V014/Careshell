@@ -1,8 +1,0 @@
-messages
-id
-userId
-senderId
-messsage
-date
-time
-imageUrl
