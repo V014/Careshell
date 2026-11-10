@@ -6,12 +6,12 @@ Careshell is a responsive PHP and MySQL clinic workspace. It runs locally with X
 
 1. Copy the project folder into `D:\xampp\htdocs\careshell` (or your XAMPP `htdocs` folder).
 2. Start **Apache** and **MySQL** in the XAMPP Control Panel.
-3. Check `config.php`. The defaults are MySQL at `127.0.0.1:3306`, database `medicalcrm`, user `root`, and an empty password. Update these values if your local MySQL setup differs.
+3. Check `config.php`. The defaults are MySQL at `127.0.0.1:3306`, database `careshell`, user `root`, and an empty password. Update these values if your local MySQL setup differs.
 4. Open [http://localhost/careshell/install.php](http://localhost/careshell/install.php).
 5. Create the first administrator account with a strong password of at least 12 characters. The setup page creates the database tables and account.
 6. Sign in at [http://localhost/careshell/login.php](http://localhost/careshell/login.php).
 
-The MySQL account needs permission to create the `medicalcrm` database. If it does not, create a database named `medicalcrm` in phpMyAdmin, import `database.sql`, then visit the setup page again.
+The MySQL account needs permission to create the `careshell` database. If it does not, create a database named `careshell` in phpMyAdmin, import `database.sql`, then visit the setup page again.
 
 ## Move records from the original desktop app
 
