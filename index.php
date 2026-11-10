@@ -314,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('error', $exception->getMessage());
         redirect($page);
     } catch (PDOException $exception) {
-        error_log('Careflow database action failed: ' . $exception->getMessage());
+        error_log('Careshell database action failed: ' . $exception->getMessage());
         flash('error', 'We could not save those changes. Check for duplicate email addresses and try again.');
         redirect($page);
     }

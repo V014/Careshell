@@ -1,6 +1,6 @@
-# Careflow Medical CRM
+# Careshell Medical CRM
 
-Careflow is a responsive PHP and MySQL clinic workspace that replaces the original Windows Forms client. It runs locally with XAMPP and includes patient records, appointment scheduling, shared reminders, team discussions and private messages, staff roles, and an administrator activity log.
+Careshell is a responsive PHP and MySQL clinic workspace. It runs locally with XAMPP and includes patient records, appointment scheduling, shared reminders, team discussions and private messages, staff roles, and an administrator activity log.
 
 ## Run locally with XAMPP
 
@@ -15,7 +15,7 @@ The MySQL account needs permission to create the `medicalcrm` database. If it do
 
 ## Move records from the original desktop app
 
-Make a backup of `MedCRM\bin\Debug\medCRM.db` first. Complete the web setup, then run this command from the project directory:
+Make a backup of `legacy\medCRM.db` first. Complete the web setup, then run this command from the project directory:
 
 ```powershell
 D:\xampp\php\php.exe migrate_legacy.php

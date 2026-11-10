@@ -13,7 +13,7 @@ if (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
     exit(1);
 }
 
-$source = $argv[1] ?? __DIR__ . DIRECTORY_SEPARATOR . 'MedCRM' . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'Debug' . DIRECTORY_SEPARATOR . 'medCRM.db';
+$source = $argv[1] ?? __DIR__ . DIRECTORY_SEPARATOR . 'legacy' . DIRECTORY_SEPARATOR . 'medCRM.db';
 $sourcePath = realpath($source);
 if ($sourcePath === false || !is_file($sourcePath)) {
     fwrite(STDERR, "Legacy database not found. Usage: php migrate_legacy.php [path-to-medCRM.db]\n");
@@ -23,7 +23,7 @@ if ($sourcePath === false || !is_file($sourcePath)) {
 $legacy = new PDO('sqlite:' . $sourcePath, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 $target = database();
 if (!$target->query("SHOW TABLES LIKE 'patients'")->fetchColumn()) {
-    fwrite(STDERR, "Careflow tables are missing. Complete setup at install.php first.\n");
+    fwrite(STDERR, "Careshell tables are missing. Complete setup at install.php first.\n");
     exit(1);
 }
 

@@ -73,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Set up Careflow</title>
+    <title>Set up Careshell</title>
     <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body class="auth-page">
 <main class="auth-card">
-    <a class="brand auth-brand" href="install.php"><span class="brand-mark">+</span><span>careflow<span class="brand-period">.</span></span></a>
+    <a class="brand auth-brand" href="install.php"><span class="brand-mark">+</span><span>careshell<span class="brand-period">.</span></span></a>
     <?php if ($complete): ?>
         <div class="auth-heading"><p class="eyebrow">YOU'RE ALL SET</p><h1>Your workspace is ready.</h1><p>Sign in with the administrator account you just created.</p></div>
         <a class="button button-primary button-wide" href="login.php">Go to sign in <span>→</span></a>

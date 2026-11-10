@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign in · Careflow</title>
+    <title>Sign in · Careshell</title>
     <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body class="auth-page">
 <main class="auth-card">
-    <a class="brand auth-brand" href="login.php"><span class="brand-mark">+</span><span>careflow<span class="brand-period">.</span></span></a>
+    <a class="brand auth-brand" href="login.php"><span class="brand-mark">+</span><span>careshell<span class="brand-period">.</span></span></a>
     <div class="auth-heading"><p class="eyebrow">YOUR CLINIC, IN SYNC</p><h1>Welcome back.</h1><p>Sign in to your care team workspace.</p></div>
     <?php if ($error !== ''): ?><div class="notice notice-error"><?= e($error) ?></div><?php endif; ?>
     <form method="post" class="stack-form">

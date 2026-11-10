@@ -17,13 +17,13 @@ $navItems = [
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f7f8">
-    <title><?= e($pageTitles[$page]) ?> · Careflow</title>
+    <title><?= e($pageTitles[$page]) ?> · Careshell</title>
     <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body class="app-body">
 <div class="app-shell">
     <aside class="sidebar" id="sidebar">
-        <a class="brand" href="index.php"><span class="brand-mark">+</span><span>careflow<span class="brand-period">.</span></span></a>
+        <a class="brand" href="index.php"><span class="brand-mark">+</span><span>careshell<span class="brand-period">.</span></span></a>
         <div class="workspace-label">WORKSPACE</div>
         <nav class="main-nav" aria-label="Main navigation">
             <?php foreach ($navItems as $key => [$label, $icon, $permission]): ?>
@@ -45,7 +45,7 @@ $navItems = [
     <main class="main-content">
         <header class="topbar">
             <button type="button" class="mobile-menu" id="menuToggle" aria-label="Open navigation">☰</button>
-            <div class="breadcrumb"><span>Careflow</span><span class="crumb-separator">/</span><strong><?= e($pageTitles[$page]) ?></strong></div>
+            <div class="breadcrumb"><span>Careshell</span><span class="crumb-separator">/</span><strong><?= e($pageTitles[$page]) ?></strong></div>
             <div class="topbar-right"><span class="today-chip"><span class="status-dot"></span> Workspace active</span><span class="top-date"><?= e(date('D, M j')) ?></span></div>
         </header>
         <section class="page-content">

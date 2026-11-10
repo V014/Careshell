@@ -20,7 +20,7 @@ try {
     $pdo = database();
     $installed = (bool) $pdo->query("SHOW TABLES LIKE 'users'")->fetchColumn();
 } catch (Throwable $exception) {
-    error_log('Careflow database connection failed: ' . $exception->getMessage());
+    error_log('Careshell database connection failed: ' . $exception->getMessage());
     http_response_code(500);
     exit('Database connection failed. Check config.php and ensure MySQL is running.');
 }
